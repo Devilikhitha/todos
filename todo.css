@@ -1,8 +1,20 @@
-body {
-    margin: 0%;
-    padding: 0%;
+body{
     background-image: url('https://i.pinimg.com/originals/ac/54/a1/ac54a128942c750799c2c1fe144d2467.jpg');
+    background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed;
+    
+}
+
+.container {
+     background-color: #b8c0ff;
+    width: 40%;
+    margin: auto; /* Center the container horizontally */
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a subtle box shadow */
+    margin-right: 5%;
+    border-radius: 10px;
 }
 
 
@@ -12,149 +24,173 @@ body {
 }
 
 
-/* Style for the main container */
-
-.inputContainer {
-    max-width: 500px;
-    margin: 20px auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-   margin-right: 10%;
-   background-color: #b8c0ff;
-  
+.input {
+    display: flex; /* Display as a flex container */
+    flex-direction: row; /* Layout children in a row */
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    flex-wrap: wrap; /* Allow content to wrap to the next line if needed */
+    width: 100%;
+    max-width: 600px; /* Limit the input section width */
+    margin: auto; /* Center the input section within the container */
+    padding: 10px;
+    box-sizing: border-box; 
 }
 
-/* Style for the text input */
-.textBox {
-    width: 70%;
+.text-input {
+    box-sizing: border-box; 
+    position: relative;
+    flex:1;
+    flex-direction: row;
+    width: 100%;
     padding: 10px;
-    margin-right: 10px;
+    border: 1px solid black;
     border-radius: 10px;
+    font-size: 16px;
+     /* Add some space between the input field and the button */
 }
 
-/* Style for the Save button */
-.saveButton {
-    padding: 8px 12px;
-    background-color: #4CAF50;
+.title-2 {
+    font-size: 20pt;
+    color: black; 
+    font-family: cursive;
+    text-align: left;
+    margin-bottom: 10px; /* Add some space between the title-2 and the input fields */
+    margin-left: 10px;
+}
+
+.save-button {
+    display: flex;
+    flex-direction: row;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #E74369;
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 4px;
     cursor: pointer;
+    box-sizing: border-box; 
+    margin-left: 15px;
 }
 
-.saveButton:hover {
-    background-color: #45a049;
+
+  /* .items-container {
+    list-style-type: none; 
+    padding: 0;
 }
 
-
-/* Style for the radio buttons container */
-.radioContainer {
+.items-container li {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    margin-top: 20px;
-}
-
-/* Style for radio buttons */
-input[type="radio"] {
-    margin-right: 5px; /* Adjust this value to add spacing between radio buttons */
-}
-
-/* Style for radio button labels */
-label {
-    margin-right: 35px; /* Adjust this value to add spacing between radio buttons */
-}
-
-
-
-/* Style for the tasks container */
-.taskContainer {
-    
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-top: 10%;
-    gap: 10px; 
-    
-   
-}
-
-/* Style for the tasks heading */
-.tasksHeading {
-    font-size: 20px;
+    list-style-type: disc; /* Use disc as the bullet point style */
+    /* background-color: #f5f5f5;
     margin-bottom: 10px;
-}
+    padding: 15px;
+    border-radius: 2px;
+} */ 
 
-/* Style for individual tasks */
-.task {
-    width: 70vh;
-    margin-bottom: 8px;
-    align-items: center;
-    margin-bottom: 5px;
-    background-color: #ffc2d1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
-}
-
-.task input {
-   margin-right: 10px;
-
-}
-
-.task .taskButton {
-    margin-right: 5px;
-}
-
-/* 
-.strike {
-    text-decoration: line-through;
-} */
-
-
-/* Strike-through effect for completed tasks */
-.task .strike {
-    text-decoration: line-through;
-  }
-  
-  /* Task buttons style */
-  .taskButton 
-  {
-    margin-left: 5px;
-    padding: 5px 10px;
+/* Style for the "Done" and "Edit" buttons */
+.displayed-items-container li button {
+    padding: 8px;
+    margin-left: 10px;
+    font-size: 14px;
     cursor: pointer;
-    background-color: #c9184a;
+}
+
+.displayed-items-container li button:hover {
+    background-color: #ddd;
+}
+
+.displayed-items-container li button.done {
+    background-color:  #E74369;
     color: white;
-    border: none;
-    border-radius: 3px;
-  }
-  
-  .taskButton:hover 
-  {
-    background-color: #800f2f;
-  }
+    
+}
 
+.displayed-items-container li button.edit {
+    background-color:  #E74369;
+    color: white;
+}
 
-
-  /* Style for the radio buttons container */
-  .radioContainer
-   {
+.button-container {
     display: flex;
-    align-items: center;    
-    padding-top: 10%;
-    margin-top: 2%;
+    gap: 8px;
+}
+
+/* Add a margin to the button container for spacing */
+
+.displayed-items-container li button.delete {
+    background-color:  #E74369;
+    color: white;
+}
+
+
+/* Your existing styles */
+
+/* Style for the display container */
+.display-container {
+    background-color: white; /* Light gray background */
+    width: 40%;
+    margin: auto; /* Center the container horizontally */
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+    margin-top: 20px; /* Add some space between the input container and display container */
+    margin-right: 5%;
+}
+
+.displayed-items-container {
+    list-style-type: none;
+    padding: 0;
+    
+}
+
+
+
+.displayed-items-container li {
+    background-color: #ffc2d1;/* Slightly darker background for list items */
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
     justify-content: space-between;
+    align-items: center;
+    display:flex;
 }
 
-/* Style for radio buttons */
-input[type="radio"] {
-    margin-right: 5px; /* Adjust this value to add spacing between radio buttons */
+.displayed-items-container li span {
+    font-size: 15px;
 }
 
-/* Style for radio button labels */
-label 
-{
-    margin-right: 50px; 
+/* Add more styles as needed */
+
+
+/* Add styles for the filter container */
+.filter-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+    padding: auto;
+}
+
+.filter-container label {
+    margin-right: 25px;
+    font-size: 20px;
+    color: black;
+    font-family: cursive;
+}
+
+/* Add some space between the input container and display container */
+.display-container {
+    margin-top: 18px; 
+    background-color: #b8c0ff;
+    width: 40%;
+     /* Center the container horizontally */
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a subtle box shadow */
+    margin-right: 5%;
+    border-radius: 10px;
+    padding-top: 10px;
 }
