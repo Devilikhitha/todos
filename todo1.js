@@ -1,194 +1,114 @@
 
 
+const tasksArray = [];
+let editTask = null;
 
-// Container creation
-let container = document.createElement("div");
-container.classList.add("inputContainer");
-document.body.appendChild(container);
+function addItem() {
+    const inputElement = document.querySelector('.text-input');
+    const inputValue = inputElement.value.trim();
 
-// Input element
-let inputEl = document.createElement("input");
-inputEl.type = 'text';
-inputEl.placeholder = 'What needs to be done?';
-inputEl.classList.add("textBox");
-container.appendChild(inputEl);
-
-// Add button
-let buttonEl = document.createElement("button");
-buttonEl.innerText = "Add to List";
-buttonEl.classList.add("saveButton");
-buttonEl.addEventListener("click", function () {
-    addTask(inputEl.value);
-    inputEl.value = "";
-});
-container.appendChild(buttonEl);
-
-// Radio buttons container
-const radioContainer = document.createElement('div');
-radioContainer.style.display = 'inline-block';
-
-// Radio buttons
-const allRadio = document.createElement('input');
-allRadio.type = 'radio';
-allRadio.name = 'status';
-allRadio.value = 'all';
-allRadio.id = 'all';
-const allLabel = document.createElement('label');
-allLabel.htmlFor = 'all';
-allLabel.textContent = 'All';
-
-const completedRadio = document.createElement('input');
-completedRadio.type = 'radio';
-completedRadio.name = 'status';
-completedRadio.value = 'completed';
-completedRadio.id = 'completed';
-const completedLabel = document.createElement('label');
-completedLabel.htmlFor = 'completed';
-completedLabel.textContent = 'Completed';
-
-const notCompletedRadio = document.createElement('input');
-notCompletedRadio.type = 'radio';
-notCompletedRadio.name = 'status';
-notCompletedRadio.value = 'not_completed';
-notCompletedRadio.id = 'not_completed';
-const notCompletedLabel = document.createElement('label');
-notCompletedLabel.htmlFor = 'not_completed';
-notCompletedLabel.textContent = 'Not Completed';
-
-// Appending radio buttons to container
-radioContainer.appendChild(allRadio);
-radioContainer.appendChild(allLabel);
-radioContainer.appendChild(completedRadio);
-radioContainer.appendChild(completedLabel);
-radioContainer.appendChild(notCompletedRadio);
-radioContainer.appendChild(notCompletedLabel);
-
-// Appending radio button container to the main container
-container.appendChild(radioContainer);
-
-// Tasks container
-let tasksContainer = document.createElement("div");
-tasksContainer.classList.add("taskContainer");
-container.appendChild(tasksContainer);
-
-// Tasks heading
-let tasksHeading = document.createElement("h1");
-tasksHeading.innerText = "My Tasks";
-tasksContainer.appendChild(tasksHeading);
-
-// Array to store tasks
-let tasks = [];
-
-// Function to add a task
-function addTask(taskContent) {
-    if (taskContent.trim() !== '') {
-        tasks.push({ content: taskContent, completed: false });
-        renderTasks();
-    } else {
-        alert("Please enter a task before saving.");
+    if (inputValue === '') {
+        return;
     }
+
+    if (editTask !== null) {
+        tasksArray[editTask.index].content = inputValue;
+        tasksArray[editTask.index].editing = false;
+        editTask = null;
+    } else {
+        const newItem = { content: inputValue, completed: false, editing: false };
+        tasksArray.push(newItem);
+    }
+
+    inputElement.value = '';
+    const activeFilter = document.querySelector('input[name="filter"]:checked').value;
+    showItems(activeFilter);
+    updateAddToListButtonText();
 }
 
-// Function to render tasks with filter options
-function renderTasks(filter = 'all') {
-    tasksContainer.innerHTML = '';
-    tasksContainer.appendChild(tasksHeading);
+function handleDone(index) {
+    tasksArray[index].completed = !tasksArray[index].completed;
+    tasksArray[index].doneButtonText = tasksArray[index].completed ? 'Undo' : 'Done';
+    tasksArray[index].editButtonText = tasksArray[index].completed ? 'Delete' : 'Edit';
 
-    let filteredTasks = tasks;
-    if (filter === 'completed') {
-        filteredTasks = tasks.filter(task => task.completed);
-    } else if (filter === 'not_completed') {
-        filteredTasks = tasks.filter(task => !task.completed);
-    }
+    const activeFilter = document.querySelector('input[name="filter"]:checked').value;
+    showItems(activeFilter);
+    updateAddToListButtonText();
+}
 
-    filteredTasks.forEach((task, index) => {
-        let taskElement = document.createElement("div");
-        taskElement.classList.add("task");
+function handleEditOrDelete(index) {
+    tasksArray[index].completed ? handleDelete(index) : handleEdit(index);
+    const activeFilter = document.querySelector('input[name="filter"]:checked').value;
+    showItems(activeFilter);
+    updateAddToListButtonText();
+}
 
-        let taskContentDiv = document.createElement("div");
-        taskContentDiv.innerText = task.content;
-        if (task.completed) {
-            taskContentDiv.classList.add("strike");
+function handleDelete(index) {
+    tasksArray.splice(index, 1);
+    showItems();
+    updateAddToListButtonText();
+}
+
+function handleEdit(index) {
+    const inputElement = document.querySelector('.text-input');
+    inputElement.value = tasksArray[index].content;
+    editTask = { index: index };
+    showItems();
+    updateAddToListButtonText();
+}
+
+function showItems(filter) {
+    const itemsContainer = document.querySelector('.displayed-items-container');
+    itemsContainer.innerHTML = '';
+
+    tasksArray.forEach((item, i) => {
+        if ((filter === 'completed' && !item.completed) || (filter === 'notcompleted' && item.completed)) {
+            return;
         }
-        taskElement.appendChild(taskContentDiv);
 
-        let buttonContainer = document.createElement("div");
+        const listItem = document.createElement('li');
+        const textSpan = document.createElement('span');
+        textSpan.textContent = item.content;
+        textSpan.style.textDecoration = item.completed ? 'line-through' : 'none';
 
-        let doneButton = document.createElement("button");
-        doneButton.innerText = task.completed ? "Undo" : "Done";
-        doneButton.classList.add("taskButton");
-        doneButton.addEventListener("click", function () {
-            tasks[index].completed = !tasks[index].completed;
-            renderTasks(filter);
-        });
+        const buttonContainer = document.createElement('div');
+        buttonContainer.classList.add('button-container');
+
+        const doneButton = document.createElement('button');
+        doneButton.textContent = item.doneButtonText || 'Done';
+        doneButton.classList.add('done');
+        doneButton.addEventListener('click', () => handleDone(i));
+
+        const editButton = document.createElement('button');
+        editButton.textContent = item.editButtonText || 'Edit';
+        editButton.classList.add('edit');
+        editButton.addEventListener('click', () => handleEditOrDelete(i));
+
+        listItem.appendChild(textSpan);
         buttonContainer.appendChild(doneButton);
-
-        let delButton = document.createElement("button");
-        delButton.innerText = "Delete";
-        delButton.classList.add("taskButton");
-        delButton.style.display = task.completed ? 'inline-block' : 'none';
-        delButton.addEventListener("click", function () {
-            taskElement.remove();
-            tasks.splice(index, 1);
-            renderTasks(filter);
-        });
-        buttonContainer.appendChild(delButton);
-
-        let editButton = document.createElement("button");
-        editButton.innerText = "Edit";
-        editButton.classList.add("taskButton");
-        editButton.addEventListener("click", function () {
-            inputEl.value = task.content;
-            let originalContent = task.content;
-
-            let saveEditButton = document.createElement("button");
-            saveEditButton.innerText = "Save Edit";
-            saveEditButton.classList.add("taskButton");
-
-            saveEditButton.addEventListener('click', function () {
-                task.content = inputEl.value;
-                if (originalContent !== inputEl.value) {
-                    renderTasks(filter);
-                }
-
-                // Clear input field and revert button back to "Add to List"
-                inputEl.value = '';
-                saveEditButton.replaceWith(buttonEl);
-            });
-
-            // Replace Add to List button with Save Edit button
-            buttonEl.replaceWith(saveEditButton);
-
-            renderTasks(filter);
-        });
         buttonContainer.appendChild(editButton);
-
-        if (task.completed) {
-            editButton.style.display = "none";
-        }
-
-        taskElement.appendChild(buttonContainer);
-        tasksContainer.appendChild(taskElement);
+        listItem.appendChild(buttonContainer);
+        itemsContainer.appendChild(listItem);
     });
 }
 
-// Adding event listeners for radio buttons
-allRadio.addEventListener('change', function () {
-    renderTasks('all');
+function updateAddToListButtonText() {
+    const addToDoListButton = document.querySelector('.save-button');
+    addToDoListButton.textContent = editTask !== null ? 'Save Edit' : 'Add to List';
+}
+
+function filterItems(filter) {
+    showItems(filter);
+}
+
+document.querySelector('.save-button').addEventListener('click', addItem);
+document.querySelector('.filter-container').addEventListener('click', (event) => {
+    if (event.target.matches('input[type="radio"]')) {
+        filterItems(event.target.value);
+    }
 });
 
-completedRadio.addEventListener('change', function () {
-    renderTasks('completed');
-});
-
-notCompletedRadio.addEventListener('change', function () {
-    renderTasks('not_completed');
-});
-
-// Initial rendering
-renderTasks();
-
-console.log(tasks);
+showItems();
 
 
 
@@ -215,175 +135,150 @@ console.log(tasks);
 
 
 
-// // Container creation
-// let container = document.createElement("div");
-// container.classList.add("inputContainer");
-// document.body.appendChild(container);
 
-// // Input element
-// let inputEl = document.createElement("input");
-// inputEl.type = 'text';
-// inputEl.placeholder = 'What needs to be done?';
-// inputEl.classList.add("textBox");
-// container.appendChild(inputEl);
 
-// // Add button
-// let buttonEl = document.createElement("button");
-// buttonEl.innerText = "Add to List";
-// buttonEl.classList.add("saveButton");
-// buttonEl.addEventListener("click", function () {
-//     addTask(inputEl.value);
-//     inputEl.value = "";
-// });
-// container.appendChild(buttonEl);
 
-// // Radio buttons container
-// const radioContainer = document.createElement('div');
-// radioContainer.style.display = 'inline-block';
 
-// // Radio buttons
-// const allRadio = document.createElement('input');
-// allRadio.type = 'radio';
-// allRadio.name = 'status';
-// allRadio.value = 'all';
-// allRadio.id = 'all';
-// const allLabel = document.createElement('label');
-// allLabel.htmlFor = 'all';
-// allLabel.textContent = 'All';
 
-// const completedRadio = document.createElement('input');
-// completedRadio.type = 'radio';
-// completedRadio.name = 'status';
-// completedRadio.value = 'completed';
-// completedRadio.id = 'completed';
-// const completedLabel = document.createElement('label');
-// completedLabel.htmlFor = 'completed';
-// completedLabel.textContent = 'Completed';
 
-// const notCompletedRadio = document.createElement('input');
-// notCompletedRadio.type = 'radio';
-// notCompletedRadio.name = 'status';
-// notCompletedRadio.value = 'not_completed';
-// notCompletedRadio.id = 'not_completed';
-// const notCompletedLabel = document.createElement('label');
-// notCompletedLabel.htmlFor = 'not_completed';
-// notCompletedLabel.textContent = 'Not Completed';
 
-// // Appending radio buttons to container
-// radioContainer.appendChild(allRadio);
-// radioContainer.appendChild(allLabel);
-// radioContainer.appendChild(completedRadio);
-// radioContainer.appendChild(completedLabel);
-// radioContainer.appendChild(notCompletedRadio);
-// radioContainer.appendChild(notCompletedLabel);
 
-// // Appending radio button container to the main container
-// container.appendChild(radioContainer);
 
-// // Tasks container
-// let tasksContainer = document.createElement("div");
-// tasksContainer.classList.add("taskContainer");
-// container.appendChild(tasksContainer);
 
-// // Tasks heading
-// let tasksHeading = document.createElement("h1");
-// tasksHeading.innerText = "My Tasks";
-// tasksContainer.appendChild(tasksHeading);
 
-// // Array to store tasks
-// let tasks = [];
 
-// // Function to add a task
-// function addTask(taskContent) {
-//     if (taskContent.trim() !== '') {
-//         tasks.push({ content: taskContent, completed: false });
-//         renderTasks();
-//     } else {
-//         alert("Please enter a task before saving.");
+
+
+
+
+
+
+// let tasksArray = [];
+// let editTask = null;
+
+// function addItem() {
+//     const inputElement = document.querySelector('.text-input');
+//     const inputValue = inputElement.value.trim();
+
+//     if (inputValue === '') {
+//         return;
 //     }
+
+//     if (editTask !== null) {
+//         tasksArray[editTask.index].content = inputValue;
+//         tasksArray[editTask.index].editing = false;
+//         editTask = null;
+//     } else {
+//         const newItem = { content: inputValue, completed: false, editing: false };
+//         tasksArray.push(newItem);
+//     }
+
+//     inputElement.value = '';
+//     showItems(getActiveFilter());
+//     updateAddToListButtonText();
 // }
 
+// function handleDone(index) {
+//     tasksArray[index].completed = !tasksArray[index].completed;
 
+//     if (tasksArray[index].completed) {
+//         tasksArray[index].doneButtonText = 'Undone';
+//         tasksArray[index].editButtonText = 'Delete';
+//     } else {
+//         tasksArray[index].doneButtonText = 'Done';
+//         tasksArray[index].editButtonText = 'Edit';
+//     }
 
-// // ... (Previous code remains unchanged up to the rendering of tasks)
+//     showItems(getActiveFilter());
+//     updateAddToListButtonText();
+// }
 
-// // Function to render tasks
-// function renderTasks() {
-//     tasksContainer.innerHTML = '';
-//     tasksContainer.appendChild(tasksHeading);
+// function handleEditOrDelete(index) {
+//     if (tasksArray[index].completed) {
+//         handleDelete(index);
+//     } else {
+//         handleEdit(index);
+//     }
 
-//     tasks.forEach((task, index) => {
-//         let taskElement = document.createElement("div");
-//         taskElement.classList.add("task");
+//     showItems(getActiveFilter());
+//     updateAddToListButtonText();
+// }
 
-//         let taskContentDiv = document.createElement("div");
-//         taskContentDiv.innerText = task.content;
-//         if (task.completed) {
-//             taskContentDiv.classList.add("strike");
+// function handleDelete(index) {
+//     tasksArray.splice(index, 1);
+//     showItems();
+//     updateAddToListButtonText();
+// }
+
+// function handleEdit(index) {
+//     const inputElement = document.querySelector('.text-input');
+//     inputElement.value = tasksArray[index].content;
+//     editTask = { index: index };
+//     showItems();
+//     updateAddToListButtonText();
+// }
+
+// function showItems(filter) {
+//     const itemsContainer = document.querySelector('.displayed-items-container');
+//     itemsContainer.innerHTML = '';
+
+//     tasksArray.forEach((item, i) => {
+//         if (filter === 'completed' && !item.completed) {
+//             return;
 //         }
-//         taskElement.appendChild(taskContentDiv);
 
-//         let buttonContainer = document.createElement("div");
+//         if (filter === 'notcompleted' && item.completed) {
+//             return;
+//         }
 
-//         let doneButton = document.createElement("button");
-//         doneButton.innerText = task.completed ? "Undo" : "Done";
-//         doneButton.classList.add("taskButton");
-//         doneButton.addEventListener("click", function () {
-//             tasks[index].completed = !tasks[index].completed;
-//             renderTasks();
-//         });
+//         const listItem = document.createElement('li');
+//         const textSpan = document.createElement('span');
+//         textSpan.textContent = item.content;
+
+//         if (item.completed) {
+//             textSpan.style.textDecoration = 'line-through';
+//         }
+
+//         const buttonContainer = document.createElement('div');
+//         buttonContainer.classList.add('button-container');
+
+//         const doneButton = document.createElement('button');
+//         doneButton.textContent = item.completed ? 'Undone' : 'Done';
+//         doneButton.classList.add('done');
+//         doneButton.addEventListener('click', () => handleDone(i));
+
+//         const editButton = document.createElement('button');
+//         editButton.textContent = item.completed ? 'Delete' : 'Edit';
+//         editButton.classList.add('edit');
+//         editButton.addEventListener('click', () => handleEditOrDelete(i));
+
+//         listItem.appendChild(textSpan);
 //         buttonContainer.appendChild(doneButton);
-
-//         let delButton = document.createElement("button");
-//         delButton.innerText = "Delete";
-//         delButton.classList.add("taskButton");
-//         delButton.style.display = task.completed ? 'inline-block' : 'none';
-//         delButton.addEventListener("click", function () {
-//             taskElement.remove();
-//             tasks.splice(index, 1);
-//             renderTasks();
-//         });
-//         buttonContainer.appendChild(delButton);
-
-//         let editButton = document.createElement("button");
-//         editButton.innerText = "Edit";
-//         editButton.classList.add("taskButton");
-//         editButton.addEventListener("click", function () {
-//             inputEl.value = task.content;
-//             let originalContent = task.content;
-
-//             let saveEditButton = document.createElement("button");
-//             saveEditButton.innerText = "Save Edit";
-//             saveEditButton.classList.add("taskButton");
-
-//             saveEditButton.addEventListener('click', function () {
-//                 task.content = inputEl.value;
-//                 if (originalContent !== inputEl.value) {
-//                     renderTasks();
-//                 }
-
-//                 // Clear input field and revert button back to "Add to List"
-//                 inputEl.value = '';
-//                 saveEditButton.replaceWith(buttonEl);
-//             });
-
-//             // Replace Add to List button with Save Edit button
-//             buttonEl.replaceWith(saveEditButton);
-
-//             renderTasks();
-//         });
 //         buttonContainer.appendChild(editButton);
-
-//         if (task.completed) {
-//             editButton.style.display = "none";
-//         }
-
-//         taskElement.appendChild(buttonContainer);
-//         tasksContainer.appendChild(taskElement);
+//         listItem.appendChild(buttonContainer);
+//         itemsContainer.appendChild(listItem);
 //     });
 // }
 
-// // Initial rendering
-// renderTasks(); 
+// function updateAddToListButtonText() {
+//     const addToDoListButton = document.querySelector('.save-button');
+//     addToDoListButton.textContent = editTask !== null ? 'Save to List' : 'Add to List';
+// }
 
+// function filterItems(filter) {
+//     showItems(filter);
+// }
 
+// function getActiveFilter() {
+//     return document.querySelector('input[name="filter"]:checked').value;
+// }
+
+// function initializeListeners() {
+//     document.querySelector('.save-button').addEventListener('click', addItem);
+//     document.querySelectorAll('input[name="filter"]').forEach((radio) => {
+//         radio.addEventListener('click', () => filterItems(getActiveFilter()));
+//     });
+// }
+
+// showItems(getActiveFilter());
+// initializeListeners();
